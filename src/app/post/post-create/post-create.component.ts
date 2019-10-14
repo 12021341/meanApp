@@ -6,7 +6,7 @@ import { PostsService } from '../post.service';
     templateUrl: './post-create.component.html',
     styleUrls: ['./post-create.component.css']
 })
-export class PostCreateComponent {
+export class PostCreateComponent { 
     enteredTitle = '';
     enteredContent = '';
 
@@ -16,7 +16,7 @@ export class PostCreateComponent {
         if (form.invalid) {
             return;
         }
-        this.postsService.addPosts(form.value.id, form.value.title, form.value.content);
+        this.postsService.addPost(form.value.title, form.value.content);
         form.resetForm();
     }
 }
