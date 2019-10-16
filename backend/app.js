@@ -1,10 +1,11 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const Post = require('./models/post'); 
 
 const app = express();
 
-const Post = require('./models/post');
+
 // mongodb+srv://markjohn:<password>@cluster0-xdkyl.mongodb.net/test?retryWrites=true&w=majority
 // ZCqR0y8WALEDJL20
 mongoose.connect("mongodb+srv://markjohn:cbct27rP@cluster0-xdkyl.mongodb.net/markapp?retryWrites=true&w=majority?", 
@@ -16,50 +17,57 @@ mongoose.connect("mongodb+srv://markjohn:cbct27rP@cluster0-xdkyl.mongodb.net/mar
 });
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // CORS issue solution 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.setHeader("Access-Control-Access-Method", "GET, POST, PATCH, DELETE, OPTIONS")
+    res.setHeader(
+        "Access-Control-Allow-Headers", 
+        "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, DELETE, OPTIONS"
+        );
  next();
 });
 
-// Post end point
-app.post("api/post", (req, res, next) => {
-    // Post object
+app.post("/api/posts", (req, res, next) => {
     const post = new Post({
         title: req.body.title,
         content: req.body.content
-    })
-    console.log(post);
-    post.save();
-    res.status(201).json({
-        message: 'Post successfully added!'
-    }); // 201 new resource is created
-
-});
-
-app.get("api/posts", (req, res, next) => {
-    Post.find().then(documents => {
-        res.status(200).json({
-            message: "Post fetch successfully!",
-            posts: documents.map()
+    });
+    post.save().then(createdPost => {
+        res.status(201).json({
+            message: "Post added successfully!",
+            postId: createdPost._id 
         });
     });
 });
 
-// Delete request
-app.delete("api/posts/:id", (req, res, next) => {
+app.get("/api/posts", (req, res, next) => {
+    Post.find().then(documents => {
+        res.status(200).json({
+            message: "Post fetched successfully!",
+            posts: documents
+        });
+    });
+});
+
+app.delete("/api/posts/:id", (req, res, next) => {
     Post.deleteOne({_id: req.params.id}).then(result => {
         console.log(result);
     })
      req.status(200).json({
-         message: "Post deleted!",
+        message: "Post deleted!",
         posts: documents
         })
 });
 
+module.exports = app;
+
+// OLD CODE!
+//  SAMPLE JSON 
 // app.use("/api/posts", (req, res, next) => {
 //     const posts = [
 //         {
@@ -79,5 +87,5 @@ app.delete("api/posts/:id", (req, res, next) => {
 //     });
 // })
 
-module.exports = app;
+
 
